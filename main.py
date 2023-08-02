@@ -4,6 +4,7 @@ from tkinter import messagebox
 from PIL import ImageTk, Image
 import os
 import pygame
+<<<<<<< HEAD
 import RPi.GPIO as GPIO
 
 BUTTONPRESSED = FALSE
@@ -18,6 +19,9 @@ directories = []
 DIR = os.getcwd
 DIR = DIR + "/main_menu"
 os.chdir(DIR)
+=======
+#import RPi.GPIO
+>>>>>>> 4293afd (commit)
 
 #init PREV_STATE to null 
 PREV_STATE="null"
