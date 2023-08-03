@@ -30,7 +30,7 @@ for i in audiofiles:
     print(i)
     #playAudio(i)
 
-os.chdir(directories[1])
+os.chdir(directories[0])
 
 currdir = os.getcwd()
 
@@ -42,7 +42,7 @@ print(audiofiles)
 
 print(directories)
 
-print(currdir)
+print("current dir: " + currdir)
 
 list = os.listdir(path=".")
 
@@ -58,5 +58,6 @@ for l in list:
     #print(temp)
 print(audiofiles)
 #playAudio(audiofiles[0])
-
+if(len(directories) == 0):
+    print("foo")
 print(directories)

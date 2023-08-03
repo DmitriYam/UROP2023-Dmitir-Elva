@@ -6,7 +6,7 @@ import os
 import pygame
 import RPi.GPIO as GPIO
 
-BUTTONPRESSED = FALSE
+BUTTONPRESSED = True
 BUTTON1 = False
 BUTTON2=False
 BUTTON3=False
@@ -15,7 +15,7 @@ directories = []
 
 
 #enter main menu
-DIR = os.getcwd
+DIR = os.getcwd()
 DIR = DIR + "/main_menu"
 os.chdir(DIR)
 
@@ -83,32 +83,58 @@ def initGPIO():
 
 initGPIO()
 initAudio()
+menuPointer = 0
 
 while True:
-    list = os.listdir(path=".")
-    for l in list:
-        if(l.endswith(".mp3")):
-           # temp = f"{DIR}/{l}"
-            audiofiles.append(l)
-        else:
-            directories.append(l)
-        #print(temp)
-
     #check for change in state
     if BUTTONPRESSED:
-        outFrame(directories[0])
-        root.update()
-        playAudio(audiofiles[0])
-        BUTTONPRESSED = False
+        list = os.listdir(path=".")
+        for l in list:
+            if(l.endswith(".mp3")):
+                audiofiles.append(l)
+            else:
+                directories.append(l)
+        
 
+        if(len(directories) != 0):
+            outFrame(directories[menuPointer])
+            directoryPointer = directories[menuPointer]
+        else:
+            for a in audiofiles:
+                if(a.endswith("voice.mp3")):
+                    audiofiles.remove(a)
+            outFrame(audiofiles[menuPointer])
+        root.update()
+        
+
+        #in main menu
+        if(len(directories) != 0):
+            os.chdir(directories[menuPointer])
+            list = os.listdir(path=".")
+            for l in list:
+                if(l.endswith("voice.mp3")):
+                    playAudio(l)
+            os.chdir("..")
+        else:
+            for a in audiofiles:
+                if(a.endswith("voice.mp3")):
+                    audiofiles.remove(a)
+            playAudio(audiofiles[menuPointer])
+        BUTTONPRESSED = False
+        directories.clear()
+        audiofiles.clear() 
     #check for inputs
     #inputs are reset at the end of functions 
     if BUTTON1:
         BUTTONPRESSED = True
+        menuPointer += 1
         BUTTON1 = False
     elif BUTTON2:
         BUTTONPRESSED = True
+        menuPointer -= 1
         BUTTON2 = False
     elif BUTTON3:
         BUTTONPRESSED = True
+        os.chdir(directoryPointer)
+        menuPointer = 0
         BUTTON3 = False
