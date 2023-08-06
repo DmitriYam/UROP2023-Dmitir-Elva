@@ -25,24 +25,6 @@ PREV_STATE="null"
 root = Tk()
 root.geometry("1000x700")
 
-def mainMenu():
-    mainMenuFrame = Frame(root, bg='#F5F5F5', bd=5)
-    mainMenuFrame.place(relx=0.2,rely=0, relwidth=0.6,relheight=0.16)
-    mainMenuLabel = Label(mainMenuFrame, text="Main menu", bg='black', fg='white', font=('Arial',30))
-    mainMenuLabel.place(relx=0,rely=0, relwidth=1, relheight=1)
-
-def exampleLesson1():
-    exampleLesson1Frame = Frame(root, bg='#F5F5F5', bd=5)
-    exampleLesson1Frame.place(relx=0.2,rely=0, relwidth=0.6,relheight=0.16)
-    exampleLesson1Label = Label(exampleLesson1Frame, text="example Lesson 1", bg='black', fg='white', font=('Arial',30))
-    exampleLesson1Label.place(relx=0,rely=0, relwidth=1, relheight=1)
-
-def exampleLesson2():
-    exampleLesson2Frame = Frame(root, bg='#F5F5F5', bd=5)
-    exampleLesson2Frame.place(relx=0.2,rely=0, relwidth=0.6,relheight=0.16)
-    exampleLesson2Label = Label(exampleLesson2Frame, text="example Lesson 2", bg='black', fg='white', font=('Arial',30))
-    exampleLesson2Label.place(relx=0,rely=0, relwidth=1, relheight=1)
-
 def outFrame(input):
     genericFrame = Frame(root, bg='#F5F5F5', bd=5)
     genericFrame.place(relx=0.2,rely=0, relwidth=0.6,relheight=0.16)
@@ -88,38 +70,38 @@ menuPointer = 0
 while True:
     #check for change in state
     if BUTTONPRESSED:
+        #add all directories and files to list 
         list = os.listdir(path=".")
         for l in list:
             if(l.endswith(".mp3")):
                 audiofiles.append(l)
             else:
                 directories.append(l)
-        
-
+        audiofiles.sort()
+        directories.sort()
+        #check if in main menu 
         if(len(directories) != 0):
             outFrame(directories[menuPointer])
             directoryPointer = directories[menuPointer]
-        else:
-            for a in audiofiles:
-                if(a.endswith("voice.mp3")):
-                    audiofiles.remove(a)
-            outFrame(audiofiles[menuPointer])
-        root.update()
-        
-
-        #in main menu
-        if(len(directories) != 0):
-            os.chdir(directories[menuPointer])
+            maxmenulen = len(directories)
+            #navigate into directory to get mp3 file for directory
+            os.chdir(directoryPointer)
             list = os.listdir(path=".")
             for l in list:
                 if(l.endswith("voice.mp3")):
-                    playAudio(l)
+                    toplay = l;
+            root.update()
+            playAudio(toplay)
             os.chdir("..")
         else:
-            for a in audiofiles:
+            for a in audiofiles:    
                 if(a.endswith("voice.mp3")):
                     audiofiles.remove(a)
-            playAudio(audiofiles[menuPointer])
+            outFrame(audiofiles[menuPointer])
+            toplay = audiofiles[menuPointer] 
+            maxmenulen = len(audiofiles)
+            root.update()
+            playAudio(toplay)
         BUTTONPRESSED = False
         directories.clear()
         audiofiles.clear() 
@@ -127,11 +109,18 @@ while True:
     #inputs are reset at the end of functions 
     if BUTTON1:
         BUTTONPRESSED = True
-        menuPointer += 1
+        print(maxmenulen)
+        if(menuPointer == (maxmenulen-1)):
+            menuPointer = 0
+        else:
+            menuPointer += 1
         BUTTON1 = False
     elif BUTTON2:
         BUTTONPRESSED = True
-        menuPointer -= 1
+        if(menuPointer == 0):
+            menuPointer = maxmenulen - 1
+        else:
+            menuPointer -= 1
         BUTTON2 = False
     elif BUTTON3:
         BUTTONPRESSED = True
