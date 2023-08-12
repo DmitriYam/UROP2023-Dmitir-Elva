@@ -7,9 +7,10 @@ import pygame
 import RPi.GPIO as GPIO
 
 BUTTONPRESSED = True
-BUTTON1 = False
+BUTTON1=False
 BUTTON2=False
 BUTTON3=False
+BUTTON4=False
 audiofiles= []
 directories = []
 
@@ -52,7 +53,10 @@ def isr3(channel):
     global BUTTON3
     BUTTON3 = True
     print("Button 3")
-
+def isr4(channel):
+    global BUTTON4
+    BUTTON4 = True
+    print("Button 4")
 #GPIO
 def initGPIO():
     GPIO.setmode(GPIO.BCM)
@@ -62,11 +66,13 @@ def initGPIO():
     GPIO.add_event_detect(26, GPIO.FALLING,callback=isr2, bouncetime=200)
     GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.add_event_detect(22, GPIO.FALLING,callback=isr3, bouncetime=200)
-
+    GPIO.setup(19, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(19, GPIO.FALLING,callback=isr4, bouncetime=200)
+    
 initGPIO()
 initAudio()
 menuPointer = 0
-
+mainmenu = False
 while True:
     #check for change in state
     if BUTTONPRESSED:
@@ -81,6 +87,7 @@ while True:
         directories.sort()
         #check if in main menu 
         if(len(directories) != 0):
+            mainmenu = True
             outFrame(directories[menuPointer])
             directoryPointer = directories[menuPointer]
             maxmenulen = len(directories)
@@ -94,6 +101,7 @@ while True:
             playAudio(toplay)
             os.chdir("..")
         else:
+            mainmenu = False
             for a in audiofiles:    
                 if(a.endswith("voice.mp3")):
                     audiofiles.remove(a)
@@ -127,3 +135,10 @@ while True:
         os.chdir(directoryPointer)
         menuPointer = 0
         BUTTON3 = False
+    elif BUTTON4:
+        BUTTONPRESSED = True
+        print(directories)
+        if(mainmenu == False):
+            os.chdir("..")
+        menuPointer = 0
+        BUTTON4 = False
