@@ -44,19 +44,19 @@ def playAudio(voicefile):
 def isr1(channel):
     global BUTTON1
     BUTTON1 = True
-    print("Button 1")
+    print("Button UP")
 def isr2(channel):
     global BUTTON2
     BUTTON2 = True
-    print("Button 2")
+    print("Button DOWN")
 def isr3(channel):
     global BUTTON3
     BUTTON3 = True
-    print("Button 3")
+    print("Button A")
 def isr4(channel):
     global BUTTON4
     BUTTON4 = True
-    print("Button 4")
+    print("Button B")
 #GPIO
 def initGPIO():
     GPIO.setmode(GPIO.BCM)
@@ -117,7 +117,6 @@ while True:
     #inputs are reset at the end of functions 
     if BUTTON1:
         BUTTONPRESSED = True
-        print(maxmenulen)
         if(menuPointer == (maxmenulen-1)):
             menuPointer = 0
         else:
@@ -132,12 +131,12 @@ while True:
         BUTTON2 = False
     elif BUTTON3:
         BUTTONPRESSED = True
-        os.chdir(directoryPointer)
-        menuPointer = 0
+        if(mainmenu): 
+            os.chdir(directoryPointer)
+            menuPointer = 0
         BUTTON3 = False
     elif BUTTON4:
         BUTTONPRESSED = True
-        print(directories)
         if(mainmenu == False):
             os.chdir("..")
         menuPointer = 0
