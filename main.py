@@ -7,21 +7,12 @@ import pygame
 import RPi.GPIO as GPIO
 
 BUTTONPRESSED = True
-BUTTON1=False
-BUTTON2=False
-BUTTON3=False
-BUTTON4=False
+BUTTONUP=False
+BUTTONDOWN=False
+BUTTONA=False
+BUTTONB=False
 audiofiles= []
 directories = []
-
-
-#enter main menu
-DIR = os.getcwd()
-DIR = DIR + "/main_menu"
-os.chdir(DIR)
-
-#init PREV_STATE to null 
-PREV_STATE="null"
 
 root = Tk()
 root.geometry("1000x700")
@@ -42,20 +33,20 @@ def playAudio(voicefile):
         continue
 #interrupt service routines
 def isr1(channel):
-    global BUTTON1
-    BUTTON1 = True
+    global BUTTONUP
+    BUTTONUP = True
     print("Button UP")
 def isr2(channel):
-    global BUTTON2
-    BUTTON2 = True
+    global BUTTONDOWN
+    BUTTONDOWN = True
     print("Button DOWN")
 def isr3(channel):
-    global BUTTON3
-    BUTTON3 = True
+    global BUTTONA
+    BUTTONA = True
     print("Button A")
 def isr4(channel):
-    global BUTTON4
-    BUTTON4 = True
+    global BUTTONB
+    BUTTONB = True
     print("Button B")
 #GPIO
 def initGPIO():
@@ -73,6 +64,28 @@ initGPIO()
 initAudio()
 menuPointer = 0
 mainmenu = False
+
+tutorialDone = True
+#tutorial
+outFrame("tutorial")
+root.update()
+playAudio("tutorial.mp3")
+
+while(tutorialDone):
+    if(BUTTONA):
+        BUTTONA = False
+        playAudio("tutorial.mp3")
+    elif(BUTTONUP or BUTTONDOWN or BUTTONB):
+        BUTTONUP = False
+        BUTTONDOWN = False
+        BUTTONB = False
+        tutorialDone = False
+
+#enter main menu
+DIR = os.getcwd()
+DIR = DIR + "/main_menu"
+os.chdir(DIR)
+
 while True:
     #check for change in state
     if BUTTONPRESSED:
@@ -115,29 +128,29 @@ while True:
         audiofiles.clear() 
     #check for inputs
     #inputs are reset at the end of functions 
-    if BUTTON1:
+    if BUTTONUP:
         BUTTONPRESSED = True
         if(menuPointer == (maxmenulen-1)):
             menuPointer = 0
         else:
             menuPointer += 1
-        BUTTON1 = False
-    elif BUTTON2:
+        BUTTONUP = False
+    elif BUTTONDOWN:
         BUTTONPRESSED = True
         if(menuPointer == 0):
             menuPointer = maxmenulen - 1
         else:
             menuPointer -= 1
-        BUTTON2 = False
-    elif BUTTON3:
+        BUTTONDOWN = False
+    elif BUTTONA:
         BUTTONPRESSED = True
         if(mainmenu): 
             os.chdir(directoryPointer)
             menuPointer = 0
-        BUTTON3 = False
-    elif BUTTON4:
+        BUTTONA = False
+    elif BUTTONB:
         BUTTONPRESSED = True
         if(mainmenu == False):
             os.chdir("..")
         menuPointer = 0
-        BUTTON4 = False
+        BUTTONB = False
