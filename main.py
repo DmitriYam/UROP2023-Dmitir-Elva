@@ -13,6 +13,7 @@ BUTTONA=False
 BUTTONB=False
 audiofiles= []
 directories = []
+quiz_audio = []
 
 root = Tk()
 root.geometry("1000x700")
@@ -59,14 +60,14 @@ def initGPIO():
     GPIO.add_event_detect(22, GPIO.FALLING,callback=isr3, bouncetime=200)
     GPIO.setup(19, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.add_event_detect(19, GPIO.FALLING,callback=isr4, bouncetime=200)
-    
+
+#initialize all required drivers
 initGPIO()
 initAudio()
-menuPointer = 0
-mainmenu = False
-
+'''
+########tutorial
 tutorialDone = True
-#tutorial
+
 outFrame("tutorial")
 root.update()
 playAudio("tutorial.mp3")
@@ -81,6 +82,10 @@ while(tutorialDone):
         BUTTONB = False
         tutorialDone = False
 
+'''
+menuPointer = 0
+mainmenu = False
+quizmode = False
 #enter main menu
 DIR = os.getcwd()
 DIR = DIR + "/main_menu"
@@ -94,7 +99,7 @@ while True:
         for l in list:
             if(l.endswith(".mp3")):
                 audiofiles.append(l)
-            else:
+            elif(l.startswith("lesson")):
                 directories.append(l)
         audiofiles.sort()
         directories.sort()
@@ -115,22 +120,76 @@ while True:
             os.chdir("..")
         else:
             mainmenu = False
-            for a in audiofiles:    
+            for a in audiofiles.copy():
                 if(a.endswith("voice.mp3")):
                     audiofiles.remove(a)
+                elif(a.startswith("quiz")):
+                    quiz_audio.append(a)
+                    audiofiles.remove(a)
+            
             outFrame(audiofiles[menuPointer])
             toplay = audiofiles[menuPointer] 
             maxmenulen = len(audiofiles)
+            
+            #in a quiz
+            if(quizmode):
+                outFrame(quiz_audio[menuPointer])
+                toplay = quiz_audio[menuPointer] 
+                maxmenulen = len(audiofiles)
+                root.update()
+                playAudio(toplay)
+                
+                #finding the correct answer
+                #this is done by splitting the name of the quiz file and extracting the correct answer
+                for q in quiz_audio:
+                    if "answer" in q:
+                        temp = q.split(".")
+                        correctans = temp[0]
+                        correctans = correctans[len(correctans)-1]
+                    elif "correct" in q:
+                        correctAudio = q
+                    elif "wrong" in q:
+                        wrongAudio = q
+               
+               #wait until input from button A or button B 
+                quizinput = False
+                while not (quizinput):
+                    if(correctans == "A"):
+                        if(BUTTONA):
+                            toplay = correctAudio
+                            quizinput = True
+                        elif(BUTTONB):
+                            toplay = wrongAudio
+                            quizinput = True
+                    elif(correctans == "B"):
+                        if(BUTTONB):
+                            toplay = correctAudio
+                            quizinput = True
+                        elif(BUTTONA):
+                            toplay = wrongAudio
+                            quizinput = True
+                print(toplay)
+                quizmode = False
+                BUTTONA = False
+                BUTTONB = False
+            
+            outFrame(toplay)
             root.update()
             playAudio(toplay)
+            #print(audiofiles[menuPointer])
+            #print(quiz_audio)
+            #print(audiofiles)
         BUTTONPRESSED = False
         directories.clear()
-        audiofiles.clear() 
+        audiofiles.clear()
+        quiz_audio.clear()
     #check for inputs
     #inputs are reset at the end of functions 
     if BUTTONUP:
         BUTTONPRESSED = True
         if(menuPointer == (maxmenulen-1)):
+            if(mainmenu == False):
+                quizmode = True
             menuPointer = 0
         else:
             menuPointer += 1
@@ -138,7 +197,7 @@ while True:
     elif BUTTONDOWN:
         BUTTONPRESSED = True
         if(menuPointer == 0):
-            menuPointer = maxmenulen - 1
+            pass
         else:
             menuPointer -= 1
         BUTTONDOWN = False
