@@ -32,6 +32,7 @@ def playAudio(voicefile):
     pygame.mixer.music.play()
     while pygame.mixer.music.get_busy() == True:
         continue
+    resetButtons()
 #interrupt service routines
 def isr1(channel):
     global BUTTONUP
@@ -61,10 +62,28 @@ def initGPIO():
     GPIO.setup(19, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.add_event_detect(19, GPIO.FALLING,callback=isr4, bouncetime=200)
 
+def resetButtons():
+    global BUTTONA
+    global BUTTONB
+    global BUTTONUP
+    global BUTTONDOWN
+    BUTTONA = False
+    BUTTONB = False
+    BUTTONUP= False
+    BUTTONDOWN = False
+
 #initialize all required drivers
 initGPIO()
 initAudio()
-'''
+
+#### stalls terminal until a button is pressed
+
+while not (BUTTONA or BUTTONB or BUTTONUP or BUTTONDOWN):
+    pass
+
+#reset buttons
+resetButtons()
+
 ########tutorial
 tutorialDone = True
 
@@ -75,6 +94,7 @@ playAudio("tutorial.mp3")
 while(tutorialDone):
     if(BUTTONA):
         BUTTONA = False
+
         playAudio("tutorial.mp3")
     elif(BUTTONUP or BUTTONDOWN or BUTTONB):
         BUTTONUP = False
@@ -82,7 +102,7 @@ while(tutorialDone):
         BUTTONB = False
         tutorialDone = False
 
-'''
+
 menuPointer = 0
 mainmenu = False
 quizmode = False
