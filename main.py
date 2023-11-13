@@ -15,6 +15,8 @@ audiofiles= []
 directories = []
 quiz_audio = []
 
+#tkinter is kinda buggy, titles are not shown sometimes.
+
 root = Tk()
 root.geometry("1000x700")
 
@@ -135,7 +137,7 @@ while True:
             for l in list:
                 if(l.endswith("voice.mp3")):
                     toplay = l;
-            root.update()
+            root.update() #check tkinter bug
             playAudio(toplay)
             os.chdir("..")
         else:
@@ -193,8 +195,8 @@ while True:
                 BUTTONA = False
                 BUTTONB = False
             
-            outFrame(toplay)
-            root.update()
+            outFrame(toplay) #check tkinter bug
+            root.update() #check tkinter bug
             playAudio(toplay)
             #print(audiofiles[menuPointer])
             #print(quiz_audio)
